@@ -729,6 +729,18 @@ end
       return contributors_signup_topic
     end
   end
+
+  def self.push_participant_score(participant_record, option, participant_score)
+    if(option == "true")
+      if(participant_score)
+        participant_record.push(participant_score[:scores][:max], participant_score[:scores][:avg], participant_score[:scores][:min])
+      else
+        participant_record.push('---', '---', '---')
+      end
+    end
+    return participant_record
+  end
+
   def self.export(csv, parent_id, options)
     @assignment = Assignment.find(parent_id)
     @questions = Hash.new
@@ -746,52 +758,25 @@ end
     for index in 0 .. @scores[:teams].length - 1
       team = @scores[:teams][index.to_s.to_sym]
       for participant in team[:team].get_participants
-        pscore = @scores[:participants][participant.id.to_s.to_sym]
-        tcsv = Array.new
-        tcsv << 'team'+index.to_s
+        participant_score = @scores[:participants][participant.id.to_s.to_sym]
+        participant_record = Array.new
+        participant_record << 'team'+index.to_s
 
         if (options["team_score"] == "true")
           if (team[:scores])
-            tcsv.push(team[:scores][:max], team[:scores][:avg], team[:scores][:min], participant.fullname)
+            participant_record.push(team[:scores][:max], team[:scores][:avg], team[:scores][:min], participant.fullname)
           else
-            tcsv.push('---', '---', '---')
+            participant_record.push('---', '---', '---')
           end
         end
 
-        if (options["submitted_score"])
-          if (pscore[:review])
-            tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg])
-          else
-            tcsv.push('---', '---', '---')
-          end
-        end
+        participant_record = push_participant_score(participant_record, options["submitted_score"], participant_score[:review])
+        participant_record = push_participant_score(participant_record, options["metareview_score"], participant_score[:metareview])
+        participant_record = push_participant_score(participant_record, options["author_feedback_score"], participant_score[:feedback])
+        participant_record = push_participant_score(participant_record, options["teammate_review_score"], participant_score[:teammate])
 
-        if (options["metareview_score"])
-          if (pscore[:metareview])
-            tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg])
-          else
-            tcsv.push('---', '---', '---')
-          end
-        end
-
-        if (options["author_feedback_score"])
-          if (pscore[:feedback])
-            tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg])
-          else
-            tcsv.push('---', '---', '---')
-          end
-        end
-
-        if (options["teammate_review_score"])
-          if (pscore[:teammate])
-            tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg])
-          else
-            tcsv.push('---', '---', '---')
-          end
-        end
-
-        tcsv.push(pscore[:total_score])
-        csv << tcsv
+        participant_record.push(participant_score[:total_score])
+        csv << participant_record
       end
     end
   end
