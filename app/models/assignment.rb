@@ -218,16 +218,7 @@ class Assignment < ActiveRecord::Base
     scores[:participants] = Hash.new    
     self.participants.each{
       | participant |
-      scores[:participants][participant.id.to_s.to_sym] = Hash.new
-      scores[:participants][participant.id.to_s.to_sym][:participant] = participant
-      questionnaires.each{
-        | questionnaire |
-        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
-        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
-        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
-
-      }
-      scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
+      scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
     }        
     
     if self.team_assignment
