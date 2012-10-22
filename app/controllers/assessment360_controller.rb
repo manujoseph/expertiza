@@ -12,7 +12,7 @@ class Assessment360Controller < ApplicationController
     @REVIEW_TYPES = ["TeammateReviewResponseMap"]
     @course = Course.find_by_id(params[:course_id])
     @assignments = Assignment.find_all_by_course_id(@course)
-    @assignments.reject! {|assignment| assignment.get_total_reviews_assigned_by_type(@REVIEW_TYPES.first) == 0 }
+    @assignments.reject! {|assignment| Response.get_total_reviews_assigned_by_type(assignment.id, @REVIEW_TYPES.first) == 0 }
 
     @assignment_pie_charts = Hash.new
     @assignment_bar_charts = Hash.new
