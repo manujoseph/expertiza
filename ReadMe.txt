@@ -22,6 +22,35 @@ The above functions would be moved from assignment.rb to response.rb and all the
 
 As on expertiza all pages where reviews of assignments are displayed should remain unchanged
 
+2. The self.export method contains a lot of statements that have been repeated.
+Refactor this method to avoid duplication.
+
+The method exports the scores of teams and their corresponding participants into a CSV.
+
+
+Refactoring done
+________________
+
+In this function, there was repetition of code to check if an option is selected.
+If the option was selected and a corresponding score existed then it was added to
+the csv to be exported.
+
+We moved the repeated code to a function and then reused the function. Also, a few
+variables were renamed for better code clarity and readability.
+
+
+Verification
+____________
+
+The diff can be viewed in the link below :-
+
+https://github.com/manujoseph/expertiza/commit/df3bdee3943af294a1d739bfb156a89b9257e17b
+
+The export assignment scores functionality of expertiza is not broken.
+
+Note: The logic that existed has a bug. It does not export the score if the assignment had only a single team.
+Since this is a refactoring project we did not fix bug or change the existing functionality.
+
 3. Other methods in assignment.rb that should not belong to this file
 
 The methods get_average_score and get_score_distribution in assignment.rb relate to reviews and are not related directly to assignments. So these methods should be present in the response.rb file rather than assignment.rb file.
@@ -47,6 +76,35 @@ The above functions would be moved from assignment.rb to response.rb and all the
 As on expertiza all pages where reviews of assignments are displayed should remain unchanged
 
 Readme file and/or other documentation. Say what project you are doing, and preferably, give a link to the project description, so your reviewers will know how to evaluate you.  If you are doing a testing-only project, give instructions on how to run the tests.
+
+4. The 'get_scores' method in the 'assignment', 'assignment_participant' and 'assignment_team'
+files contain lines of code that appear to be repeated. Can this be refactored so that
+only one method implements the common functionality?
+
+The get_scores method returns the score of a paritcipant for the given questions.
+
+Refactoring done
+________________
+The get_scores method returns the score of a particular paritcipant for the given questions.
+So it is more appropriate to have the function implemented as an instance method of the
+Participant model.
+
+Removed the function from required in AssignmentParticipant, since it inherits Participant,
+and Participant already implements the get_scores method.
+
+Removed the repeated code which gets the score for all participants in the assignment.
+The repeated code was removed and replaced my a call to the get_scores instance method
+of participant.
+
+
+Verification
+____________
+
+The diff can be viewed in the link below :-
+
+https://github.com/manujoseph/expertiza/commit/b0c43755e8914059461a2b8e220db61a63dd6392
+
+The scores of the participants in an assignment continues to be displayed in expertiza.
 
 5. Refactor 'get_hyperlinks' to replace the conditional statement with polymorphism. (see get_hyperlinks method in assignment_team).
 - The get_hyperlinks method is used to get all the submission links associated with the particular assignment by a particular user/team. Hence, in the earlier method, get_hyperlinks would be called by either a team or an individual participant object based upon the nature of the assignment.
@@ -80,11 +138,11 @@ https://github.com/manujoseph/expertiza/commit/0f1761e226b354467f2f981b88a7aff49
 
 For testing purposes, with the admin login, one can check for grades and reviews on any given assignment to gauge the impact.
 
-
 8. Also apply other refactorings such as Rename variable, Rename method to give the variables and methods more meaningful names
 
 Typo in submit_hyperlinks method in assignment_participant.rb corrected (commit: https://github.com/manujoseph/expertiza/commit/374d442b3a4867531877e9755c2ab14c30714614)
 
+renamed 'pscore' to 'participant_score' and 'tcsv' to 'participant_record' in the self.export of assignment.rb
 
 
 
