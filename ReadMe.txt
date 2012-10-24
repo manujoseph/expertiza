@@ -46,6 +46,41 @@ The above functions would be moved from assignment.rb to response.rb and all the
 
 As on expertiza all pages where reviews of assignments are displayed should remain unchanged
 
+Readme file and/or other documentation. Say what project you are doing, and preferably, give a link to the project description, so your reviewers will know how to evaluate you.  If you are doing a testing-only project, give instructions on how to run the tests.
+
+5. Refactor 'get_hyperlinks' to replace the conditional statement with polymorphism. (see get_hyperlinks method in assignment_team).
+- The get_hyperlinks method is used to get all the submission links associated with the particular assignment by a particular user/team. Hence, in the earlier method, get_hyperlinks would be called by either a team or an individual participant object based upon the nature of the assignment.
+
+Refactoring done
+________________
+- We add a simple logic check called get_members to find the type of the member for the particular assignment type. Just like the get_hyperlinks method in assignment_team, we refactor it to salvage polymorphism and have a simple for loop get all the related links according to the object type returned by get_members.
+
+
+Verification
+____________
+
+Code can be verified in the github commit:
+https://github.com/manujoseph/expertiza/commit/0f1761e226b354467f2f981b88a7aff4952f218b
+
+For testing purposes, any assignment submission page would reflect the changes and function normally/as before.
+
+
+6. Refactor the 'get_reviews' method by replacing the conditional statement with polymorphism.
+- The get_reviews method is used to get all the reviews for a particular assignment (team or individual) for the instructor/admin to view. This function is alternatively also used at many other places to aggregate and display the reviews for the particular assignment. The function uses a conditional block to test if the assignment is group or invididual and accordingly calls the appropriate ResponseMap object, which eitherways calls get_assessment_for(). Also again, the parameter passed to the get_assessment_for() function is decided based on the type of the assignment which is either group or individual.
+
+Refactoring done
+________________
+- We again impart polymorphism by using a generic ResponseMap object to call the get_assessment_for() method. Again, we try to have a simple logic block outisde which determines the participant type and calls the get_reviews methods.
+
+Verification
+____________
+
+Code can be verified in the github commit:
+https://github.com/manujoseph/expertiza/commit/0f1761e226b354467f2f981b88a7aff4952f218b
+
+For testing purposes, with the admin login, one can check for grades and reviews on any given assignment to gauge the impact.
+
+
 8. Also apply other refactorings such as Rename variable, Rename method to give the variables and methods more meaningful names
 
 Typo in submit_hyperlinks method in assignment_participant.rb corrected (commit: https://github.com/manujoseph/expertiza/commit/374d442b3a4867531877e9755c2ab14c30714614)
