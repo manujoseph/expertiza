@@ -96,15 +96,20 @@ class AssignmentParticipant < Participant
     self.save
   end
 
-  # TODO:REFACTOR: This shouldn't be handled using an if statement, but using 
-  # polymorphism for individual and team participants
-  def get_hyperlinks         
-    if self.team     
-      links = self.team.get_hyperlinks     
-    else        
-      links = get_hyperlinks_array
+  def get_members
+    if self.team.nil?
+      [self]
+    else
+      self.team.get_participants
     end
+  end
 
+
+  def get_hyperlinks
+    links = Array.new
+    for team_member in self.get_members
+      links.concat(team_member.get_hyperlinks_array)
+    end
     return links
   end
 
@@ -136,13 +141,17 @@ class AssignmentParticipant < Participant
   def get_feedback
     return FeedbackResponseMap.get_assessments_for(self)      
   end
-  
-  def get_reviews
+
+  def get_participant
+     participant = self
     if self.assignment.team_assignment
-      return TeamReviewResponseMap.get_assessments_for(self.team)          
-    else
-      return ParticipantReviewResponseMap.get_assessments_for(self)
+       participant = self.team
     end
+    participant
+  end
+
+  def get_reviews
+    return ResponseMap.get_assessments_for(get_participant())
   end
    
   def get_metareviews
