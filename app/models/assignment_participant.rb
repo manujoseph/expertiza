@@ -48,22 +48,6 @@ class AssignmentParticipant < Participant
     self.user.name
   end
 
-  # Return scores that this participant has given
-  def get_scores(questions)
-    scores = Hash.new
-    scores[:participant] = self # This doesn't appear to be used anywhere
-    self.assignment.questionnaires.each do |questionnaire|
-      scores[questionnaire.symbol] = Hash.new
-      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-
-
-
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
-    end
-    scores[:total_score] = assignment.compute_total_score(scores)
-    return scores
-  end
-
   # Appends the hyperlink to a list that is stored in YAML format in the DB
   # @exception  If is hyperlink was already there
   #             If it is an invalid URL
@@ -96,15 +80,20 @@ class AssignmentParticipant < Participant
     self.save
   end
 
-  # TODO:REFACTOR: This shouldn't be handled using an if statement, but using 
-  # polymorphism for individual and team participants
-  def get_hyperlinks         
-    if self.team     
-      links = self.team.get_hyperlinks     
-    else        
-      links = get_hyperlinks_array
+  def get_members
+    if self.team.nil?
+      [self]
+    else
+      self.team.get_participants
     end
+  end
 
+
+  def get_hyperlinks
+    links = Array.new
+    for team_member in self.get_members
+      links.concat(team_member.get_hyperlinks_array)
+    end
     return links
   end
 
@@ -136,13 +125,17 @@ class AssignmentParticipant < Participant
   def get_feedback
     return FeedbackResponseMap.get_assessments_for(self)      
   end
-  
-  def get_reviews
+
+  def get_participant
+     participant = self
     if self.assignment.team_assignment
-      return TeamReviewResponseMap.get_assessments_for(self.team)          
-    else
-      return ParticipantReviewResponseMap.get_assessments_for(self)
+       participant = self.team
     end
+    participant
+  end
+
+  def get_reviews
+    return ResponseMap.get_assessments_for(get_participant())
   end
    
   def get_metareviews
