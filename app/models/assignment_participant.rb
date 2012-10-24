@@ -48,22 +48,6 @@ class AssignmentParticipant < Participant
     self.user.name
   end
 
-  # Return scores that this participant has given
-  def get_scores(questions)
-    scores = Hash.new
-    scores[:participant] = self # This doesn't appear to be used anywhere
-    self.assignment.questionnaires.each do |questionnaire|
-      scores[questionnaire.symbol] = Hash.new
-      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-
-
-
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
-    end
-    scores[:total_score] = assignment.compute_total_score(scores)
-    return scores
-  end
-
   # Appends the hyperlink to a list that is stored in YAML format in the DB
   # @exception  If is hyperlink was already there
   #             If it is an invalid URL
