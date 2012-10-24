@@ -67,7 +67,7 @@ class AssignmentParticipant < Participant
   # Appends the hyperlink to a list that is stored in YAML format in the DB
   # @exception  If is hyperlink was already there
   #             If it is an invalid URL
-  def submmit_hyperlink(hyperlink)
+  def submit_hyperlink(hyperlink)
     hyperlink.strip!
     raise "The hyperlink cannot be empty" if hyperlink.empty?
 
@@ -371,7 +371,7 @@ class AssignmentParticipant < Participant
 
 private
 
-  # Use submmit_hyperlink(), remove_hyperlink() instead
+  # Use submit_hyperlink(), remove_hyperlink() instead
   def submitted_hyperlinks=(val)
     write_attribute :submitted_hyperlinks, val
   end
