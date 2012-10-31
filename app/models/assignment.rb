@@ -211,10 +211,12 @@ class Assignment < ActiveRecord::Base
      }
      return mappings     
   end
-  
+
+  #Get the scores of all the participants in the assignment
   def get_scores(questions)
     scores = Hash.new
 
+    #Changed this part to get the scores of a participant by making use of the participant instance method
     scores[:participants] = Hash.new    
     self.participants.each{
       | participant |
@@ -721,8 +723,11 @@ end
     end
   end
 
+  #Push the score from the participant_score hash to participant record array for the selected option
   def self.push_participant_score(participant_record, option, participant_score)
+    #if the option is selected
     if(option == "true")
+      #if the hash has scores for the selected option, then push to array
       if(participant_score)
         participant_record.push(participant_score[:scores][:max], participant_score[:scores][:avg], participant_score[:scores][:min])
       else
@@ -761,6 +766,7 @@ end
           end
         end
 
+        #changed this part to remove repeated code.
         participant_record = push_participant_score(participant_record, options["submitted_score"], participant_score[:review])
         participant_record = push_participant_score(participant_record, options["metareview_score"], participant_score[:metareview])
         participant_record = push_participant_score(participant_record, options["author_feedback_score"], participant_score[:feedback])

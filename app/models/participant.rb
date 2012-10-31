@@ -171,7 +171,7 @@ class Participant < ActiveRecord::Base
     (((sum_of_scores.to_f / number_of_scores.to_f) * 100).to_i) / 100.0
   end
 
-  # Return scores that this participant has given
+  # Return scores that this participant for the given questions
   def get_scores(questions)
     scores = Hash.new
     scores[:participant] = self
